@@ -8,6 +8,64 @@ date: "2024-02-07"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+```{r, include = FALSE}
+library(tidyverse)
+library(mosaic)
+library(ggplot2)
+library(rsample)
+library(rsample)
+library(caret)
+library(modelr)
+library(parallel)
+library(foreach)
+library(kknn)
+hotels_dev = read.csv("C://Users/jacob/Downloads/hotels_dev.csv", header = TRUE) 
+```
+
+
+```{r, include = FALSE}
+#Test/Train splits
+#Create training k-folds
+K_folds = 10
+hotel_folds = crossv_kfold(hotel_devs, k=K_folds)
+
+
+
+threefifty_cv_grid = foreach(k = threefifty_k_grid, .combine='rbind') %dopar% {
+  models = map(threefifty_folds$train, ~ knnreg(price ~ mileage, k=k, data = ., use.all=FALSE))
+  errs = map2_dbl(models, threefifty_folds$test, modelr::rmse)
+  c(k=k, err = mean(errs))
+} %>% as.data.frame
+
+```
+
+To estimate out of sample performance for these 3 models, we will use K-fold cross validation with K = 10
+
+
+```{r, include = FALSE}
+spec_reg = lm(children ~ market_segment+ adults + customer_type +is_repeated_guest, data=hotels_dev)
+all_reg = lm(children ~ . -arrival_date, data=hotels_dev)
+set.seed(2252024)
+train.control = trainControl(method = "cv", number = 10)
+spec_model = train(children ~ market_segment+ adults + customer_type + is_repeated_guest, data=hotels_dev, method = "lm", trControl = train.control)
+print(spec_model)
+spec_rmse = spec_model$results$RMSE
+```
+
+```{r, include = TRUE}
+spec_rmse
+```
+
+```{r, include = TRUE}
+
+```
+
+```{r, include = FALSE}
+
+```
+
+
 ## R Markdown
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
