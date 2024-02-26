@@ -112,6 +112,16 @@ plot(roc_graph, main = "ROC Curve", col = "blue")
 ```
 
 ## Fold test
+```{r, include =TRUE}
+val_folds = createFolds(hotels_val$children, k=20, list = TRUE)
+predict_child = foreach(i=seq_along(val_folds), .combine = "c") %dopar%{
+  current_fold = val_folds[[i]]
+  data_fold = hotels_dev[current_fold,]
+  predicted_child = predict(engineered_model, data_fold)
+  sum(predicted_child)
+}
+barplot(predict_child, names.arg = seq_along(val_folds), xlab = "Fold", ylab = "Sum of Predicted Values", main = "Sum of Predicted Values for Each Fold")
+```
 
 
 ## R Markdown
