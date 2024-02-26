@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r, include = FALSE}
+library(lubridate)
 library(tidyverse)
 library(mosaic)
 library(ggplot2)
@@ -24,21 +25,6 @@ hotels_dev = read.csv("C://Users/jacob/Downloads/hotels_dev.csv", header = TRUE)
 ```
 
 
-```{r, include = FALSE}
-#Test/Train splits
-#Create training k-folds
-K_folds = 10
-hotel_folds = crossv_kfold(hotel_devs, k=K_folds)
-
-
-
-threefifty_cv_grid = foreach(k = threefifty_k_grid, .combine='rbind') %dopar% {
-  models = map(threefifty_folds$train, ~ knnreg(price ~ mileage, k=k, data = ., use.all=FALSE))
-  errs = map2_dbl(models, threefifty_folds$test, modelr::rmse)
-  c(k=k, err = mean(errs))
-} %>% as.data.frame
-
-```
 
 To estimate out of sample performance for these 3 models, we will use K-fold cross validation with K = 10
 
@@ -58,8 +44,53 @@ spec_rmse
 ```
 
 ```{r, include = TRUE}
+all_model = train(children ~ .-arrival_date, 
+                  data=hotels_dev, 
+                  method = "lm", 
+                  trControl = train.control)
+all_rmse = all_model$results$RMSE
+```
+
+```{r, include = TRUE}
+all_rmse
+```
+
+```{r, include = FALSE}
+hotels_dev = hotels_dev %>%
+  mutate(month = month(arrival_date),
+         summer = ifelse(month >= 6 & month <= 8, 1, 0),
+         week_day = wday(arrival_date),
+         weekend_arrival = ifelse(week_day == 5|week_day == 6, 1, 0)
+         )
+```
+
+```{r, include = FALSE}
+engineered_reg = children ~ hotel+required_car_parking_spaces + 
+                              total_of_special_requests + meal + poly(adults, 2)
+                              + is_repeated_guest + summer
+```
+
+```{r, include = TRUE}
+engineered_model = train(children ~ market_segment+ poly(adults,2) + customer_type                                               +is_repeated_guest + summer + lead_time 
+                                   +previous_cancellations + previous_bookings_not_canceled 
+                                   + previous_cancellations*previous_bookings_not_canceled 
+                                  + stays_in_weekend_nights + meal + market_segment 
+                                   + distribution_channel + reserved_room_type                                                   + assigned_room_type + booking_changes + deposit_type 
+                                   + days_in_waiting_list + average_daily_rate 
+                                   + required_car_parking_spaces                                                                 +  poly(total_of_special_requests, 2), 
+                  data=hotels_dev, 
+                  method = "lm", 
+                  trControl = train.control)
+engineered_rmse = engineered_model$results$RMSE
 
 ```
+
+```{r, include = TRUE}
+spec_rmse
+all_rmse
+engineered_rmse
+```
+
 
 ```{r, include = FALSE}
 
