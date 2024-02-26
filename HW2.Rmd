@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r, include = FALSE}
+library(pROC)
 library(lubridate)
 library(tidyverse)
 library(mosaic)
@@ -64,11 +65,6 @@ hotels_dev = hotels_dev %>%
          )
 ```
 
-```{r, include = FALSE}
-engineered_reg = children ~ hotel+required_car_parking_spaces + 
-                              total_of_special_requests + meal + poly(adults, 2)
-                              + is_repeated_guest + summer
-```
 
 ```{r, include = TRUE}
 engineered_model = train(children ~ market_segment+ poly(adults,2) + customer_type                                               +is_repeated_guest                                                                            + is_repeated_guest*previous_cancellations                                                   + month + summer + poly(lead_time,2) 
@@ -108,7 +104,11 @@ hotels_val = hotels_val %>%
          )
 predict_val = predict(engineered_model, hotels_val)
 roc_graph = roc(hotels_val$children, predict_val)
-plot(roc_graph, main = "ROC Curve", col = "blue")
+plot(roc_graph, main = "ROC Curve" , col = "blue")
+ggplot(data = coords(roc_graph), aes(x = 1 - specificity, y = sensitivity)) +
+  geom_line(color = "blue") +
+  labs(title = "ROC Curve") +
+  theme_minimal()
 ```
 
 ## Fold test
