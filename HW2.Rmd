@@ -71,13 +71,13 @@ engineered_reg = children ~ hotel+required_car_parking_spaces +
 ```
 
 ```{r, include = TRUE}
-engineered_model = train(children ~ market_segment+ poly(adults,2) + customer_type                                               +is_repeated_guest + summer + lead_time 
+engineered_model = train(children ~ market_segment+ poly(adults,2) + customer_type                                               +is_repeated_guest                                                                            + is_repeated_guest*previous_cancellations                                                   + month + summer + poly(lead_time,2) 
                                    +previous_cancellations + previous_bookings_not_canceled 
                                    + previous_cancellations*previous_bookings_not_canceled 
-                                  + stays_in_weekend_nights + meal + market_segment 
+                                  + poly(stays_in_weekend_nights, 2) + meal + market_segment 
                                    + distribution_channel + reserved_room_type                                                   + assigned_room_type + booking_changes + deposit_type 
                                    + days_in_waiting_list + average_daily_rate 
-                                   + required_car_parking_spaces                                                                 +  poly(total_of_special_requests, 2), 
+                                   + required_car_parking_spaces                                                                 +  poly(total_of_special_requests, 2)                                                         +  poly(stays_in_week_nights,2), 
                   data=hotels_dev, 
                   method = "lm", 
                   trControl = train.control)
@@ -95,6 +95,23 @@ engineered_rmse
 ```{r, include = FALSE}
 
 ```
+
+
+## Data Validation
+```{r, include = TRUE}
+hotels_val = read.csv("C://Users/jacob/Downloads/hotels_val.csv", header = TRUE)
+hotels_val = hotels_val %>%
+  mutate(month = month(arrival_date),
+         summer = ifelse(month >= 6 & month <= 8, 1, 0),
+         week_day = wday(arrival_date),
+         weekend_arrival = ifelse(week_day == 5|week_day == 6, 1, 0)
+         )
+predict_val = predict(engineered_model, hotels_val)
+roc_graph = roc(hotels_val$children, predict_val)
+plot(roc_graph, main = "ROC Curve", col = "blue")
+```
+
+## Fold test
 
 
 ## R Markdown
