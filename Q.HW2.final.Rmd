@@ -1,0 +1,54 @@
+---
+title: "q2.hw2"
+output: word_document
+date: "2024-02-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, warning=FALSE,include=FALSE}
+library(ggplot2)
+library(dplyr)
+
+setwd("C:/Users/musab/OneDrive/Documents/ECON MA/Data mining/HW2/")
+
+credit_data <- read.csv("german_credit.csv")
+```
+
+```{r, echo=FALSE, warning=FALSE,include=FALSE}
+credit_data$Default <- as.factor(credit_data$Default)
+credit_data$history <- factor(credit_data$history, levels = c("good", "poor", "terrible"))
+credit_data$purpose <- as.factor(credit_data$purpose)
+credit_data$foreign <- as.factor(credit_data$foreign)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+credit_history_summary <- credit_data %>%
+  group_by(history) %>%
+  summarise(Default_Probability = mean(as.numeric(Default) - 1)) %>%
+  arrange(desc(Default_Probability))
+
+ggplot(credit_history_summary, aes(x = history, y = Default_Probability, fill = history)) +
+  geom_bar(stat = "identity") +
+  labs(y = "Default Probability", x = "Class of Credit History", title = "Default Probability by Credit History") +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r, echo=FALSE, warning=FALSE}
+credit_train <- credit_data
+logit_default <- glm(Default ~ duration + amount + installment + age + history + purpose + foreign, 
+                     data = credit_train, 
+                     family = binomial)
+
+rounded_coefs <- round(coef(logit_default), 2)
+
+print(rounded_coefs)
+```
+
+The  data and analysis from a German bank highlight a puzzling relationship between credit history and loan defaults. The bar plot indicates that worse credit history is associated with higher default rates. However, the logistic regression model suggests the opposite, with 'poor' and 'terrible' credit histories associated with lower default probabilities, which contradicts common financial intuition.
+
+This contradiction is likely due to the bank's sampling method, which oversamples defaults. This method creates a bias, making the model less applicable to the general population of borrowers. For the model to be useful in screening new borrowers, the bank needs to use a sample that accurately reflects the true default rate in its overall portfolio. Correcting this sampling bias is essential for the bank to develop a reliable model for classifying borrowers by default risk.

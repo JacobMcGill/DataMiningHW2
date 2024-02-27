@@ -8,7 +8,6 @@ date: "2024-02-07"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ```{r, include = FALSE}
 library(pROC)
 library(lubridate)
@@ -122,6 +121,8 @@ predict_child = foreach(i=seq_along(val_folds), .combine = "c") %dopar%{
 }
 barplot(predict_child, names.arg = seq_along(val_folds), xlab = "Fold", ylab = "Sum of Predicted Values", main = "Sum of Predicted Values for Each Fold")
 ```
+
+
 
 
 ## R Markdown
