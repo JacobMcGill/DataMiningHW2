@@ -1,0 +1,176 @@
+---
+title: "HW_2_Final"
+output: html_document
+date: "2024-02-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include = FALSE}
+library(pROC)
+library(lubridate)
+library(tidyverse)
+library(mosaic)
+library(ggplot2)
+library(rsample)
+library(rsample)
+library(caret)
+library(modelr)
+library(parallel)
+library(foreach)
+library(kknn)
+library(reshape2)
+hotels_dev = read.csv("C://Users/jacob/Downloads/hotels_dev.csv", header = TRUE) 
+```
+
+## Model Engineering
+
+To estimate the performance of these 3 models, we will use K-fold cross validation with K = 10 to calculate the RMSE for each linear probability model. 
+
+
+```{r, include = FALSE}
+spec_reg = lm(children ~ market_segment+ adults + customer_type +is_repeated_guest, data=hotels_dev)
+all_reg = lm(children ~ . -arrival_date, data=hotels_dev)
+set.seed(2252024)
+train.control = trainControl(method = "cv", number = 10)
+spec_model = train(children ~ market_segment+ adults + customer_type + is_repeated_guest, data=hotels_dev, method = "lm", trControl = train.control)
+print(spec_model)
+spec_rmse = spec_model$results$RMSE
+```
+
+The 1st model has the following estimated RMSE:
+
+```{r, include = TRUE}
+spec_rmse
+```
+
+```{r, include = FALSE}
+all_model = train(children ~ .-arrival_date, 
+                  data=hotels_dev, 
+                  method = "lm", 
+                  trControl = train.control)
+all_rmse = all_model$results$RMSE
+```
+The model with all the data provided (exlcuding arrival date) has the following estimated RMSE:
+```{r, include = TRUE}
+all_rmse
+```
+For the best performing model, we expanded off the all model and added several interaction terms and polynomials. We fitted adults to a 2nd degree polynomial, since increasing adults up to likely increases the chance of children coming but after the would decrease. We also fitted lead time to a 2nd degree polynomial, since reservations booked very early and very late would likely be business trips, as well as total number of special requests since families may make some requests for their children but a large amount indicates some special or business event. Finally, stay in weekend nights and stay in week nights were fitted to 2nd degree polynomials as well, as large amounts of both would indicate long term stays, which would likely not have children. I also added an interaction term for is_repeated_guest and previous_bookings_not_canceled, as that may indicate a repeat customer who makes sudden changes to their bookings, which would likely not have a child. Finally, I extracted several pieces of data from the timestamp of arrival. "Summer" marks whether the reservation was in the Summer, a time when children are more likely to be traveling. I also added week_end arrival, which tracked if the reservation started on Friday or Saturday. As people arriving on those days are likely traveling for vacation rather than business, it would be reasonable to assume children would be more likely to be on the reservation.
+```{r, include = FALSE}
+hotels_dev = hotels_dev %>%
+  mutate(month = month(arrival_date),
+         summer = ifelse(month >= 6 & month <= 8, 1, 0),
+         week_day = wday(arrival_date),
+         weekend_arrival = ifelse(week_day == 5|week_day == 6, 1, 0)
+         )
+```
+
+
+```{r, include = FALSE}
+engineered_model = train(children ~ market_segment+ poly(adults,2) + customer_type                                               +is_repeated_guest                                                                            + is_repeated_guest*previous_cancellations                                                   + month + summer +adults*summer + poly(lead_time,2) 
+                                   +previous_cancellations + previous_bookings_not_canceled 
+                                   + previous_cancellations*previous_bookings_not_canceled 
+                                  + poly(stays_in_weekend_nights, 2) + meal + market_segment 
+                                   + distribution_channel + reserved_room_type                                                   + assigned_room_type + poly(booking_changes, 2)                                               + deposit_type 
+                                   + days_in_waiting_list + poly(average_daily_rate,2) 
+                                   + required_car_parking_spaces                                                                 +  poly(total_of_special_requests, 2)                                                         +  poly(stays_in_week_nights,2), 
+                  data=hotels_dev, 
+                  method = "lm", 
+                  trControl = train.control)
+engineered_rmse = engineered_model$results$RMSE
+
+```
+The RMSE for the engineered model is:
+```{r, include = TRUE}
+engineered_rmse
+```
+As can be seen, this model outperforms the other 2 in terms of RMSE.
+
+
+## Data Validation
+
+I am then moving on to validating the data with the hotels_val set. To do so, I graph the the model's Total Positivity Rate (TPR) and False Positivity Rate (FPR) as a function of t, the threshold for considering a predicted probability a yes.
+```{r, include = FALSE}
+hotels_val = read.csv("C://Users/jacob/Downloads/hotels_val.csv", header = TRUE)
+hotels_val = hotels_val %>%
+  mutate(month = month(arrival_date),
+         summer = ifelse(month >= 6 & month <= 8, 1, 0),
+         week_day = wday(arrival_date),
+         weekend_arrival = ifelse(week_day == 5|week_day == 6, 1, 0)
+         )
+predict_val = predict(engineered_model, hotels_val)
+```
+
+```{r, include = TRUE}
+ggplot(data = coords(roc_graph), aes(x = 1 - specificity, y = sensitivity)) +
+  geom_line(color = "blue") +
+  labs(title = "ROC Curve") +
+  labs(x = "FPR(t)", y = "TPR(t)")  +
+  theme_minimal()
+```
+
+
+## Fold test
+
+After graphing the ROC curve, we move to testing model against 20 equal sized folds int he validation data set.
+```{r, include = FALSE}
+val_folds = createFolds(hotels_val$children, k=20, list = TRUE)
+predict_booking = function(fold_indices, data) {
+  data_fold = data[fold_indices,]
+  predicted_probs = predict(engineered_model, newdata = data_fold)
+  sum(predicted_probs)
+}
+predicted_bookings = foreach(i = seq_along(val_folds), .combine = "c") %dopar% {
+  predict_booking(val_folds[[i]], hotels_val)
+}
+actual_bookings = sapply(val_folds, function(fold_indices) {
+  sum(hotels_val$children[fold_indices])
+})
+
+comparison_data = data.frame(Fold = seq_along(val_folds), Actual_Bookings = actual_bookings, Predicted_Bookings = predicted_bookings)
+```
+
+The below figure summarizes this performance, with the red bars being the actual amount of bookings with children and the red the predicted amount of bookings. As can be seen, the model does moderately well at predicting the total number of bookings with children. While the model did not perfectly predict a fold, it was never substantially of (such as having a prediction off by 10 or more). Considering that each fold has about 250 bookings, that is not a substantial deviance.
+
+```{R, include = TRUE}
+graph_comparison = melt(comparison_data, id.vars = "Fold", variable.name = "Type", value.name = "Sum")
+
+ggplot(graph_comparison, aes(x = factor(Fold), y = Sum, fill = Type)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
+  labs(x = "Fold", y = "Bookings", title = "Comparison of Predicted vs. Actual Bookings") 
+```
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
