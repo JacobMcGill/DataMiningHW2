@@ -4,6 +4,7 @@ authors: "Daniel Oliner, Musab Alquwaee, Jacob McGill"
 output: md_document
 date: "2024-02-07"
 ---
+# ECO 395M HW 1: Daniel Oliner, Musab Alquwaee, Jacob McGill
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

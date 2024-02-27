@@ -1,3 +1,5 @@
+# ECO 395M HW 1: Daniel Oliner, Musab Alquwaee, Jacob McGill
+
 # Question 2
 
 ![](HW_2_Final_files/figure-markdown_strict/unnamed-chunk-3-1.png)
