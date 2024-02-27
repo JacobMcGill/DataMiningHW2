@@ -1,7 +1,8 @@
 ---
-title: "HW_2_Final"
-output: html_document
-date: "2024-02-27"
+title: "DHW2"
+authors: "Daniel Oliner, Musab Alquwaee, Jacob McGill"
+output: md_document
+date: "2024-02-07"
 ---
 
 ```{r setup, include=FALSE}
@@ -146,6 +147,7 @@ hotels_val = hotels_val %>%
          weekend_arrival = ifelse(week_day == 5|week_day == 6, 1, 0)
          )
 predict_val = predict(engineered_model, hotels_val)
+roc_graph = roc(hotels_val$children, predict_val)
 ```
 
 ```{r, include = TRUE}
@@ -187,34 +189,3 @@ ggplot(graph_comparison, aes(x = factor(Fold), y = Sum, fill = Type)) +
   labs(x = "Fold", y = "Bookings", title = "Comparison of Predicted vs. Actual Bookings") 
 ```
 
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

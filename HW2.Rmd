@@ -1,6 +1,7 @@
 ---
 title: "HW2"
-output: html_document
+authors: "Daniel Oliner, Musab Alquwaee, Jacob McGill"
+output: md_document
 date: "2024-02-07"
 ---
 
