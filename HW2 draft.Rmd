@@ -1,0 +1,142 @@
+---
+title: "exercises2"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(modelr)
+library(rsample)
+library(mosaic)
+library(caret)
+data(SaratogaHouses)
+glimpse(SaratogaHouses)
+
+saratoga_split = initial_split(SaratogaHouses, prop = 0.8)
+saratoga_train = training(saratoga_split)
+saratoga_test = testing(saratoga_split)
+
+lm1 = lm(price ~ lotSize + bedrooms + bathrooms, data=saratoga_train)
+lm2 = lm(price ~ . - pctCollege - sewer - waterfront - landValue - newConstruction, data=saratoga_train)
+lm3 = lm(price ~ (. - pctCollege - sewer - waterfront - landValue - newConstruction)^2, data=saratoga_train)
+
+rmse(lm1, saratoga_test)
+rmse(lm2, saratoga_test)
+rmse(lm3, saratoga_test)
+
+```
+
+# Q1: Executive Summary
+
+This report outlines the methodologies and findings from a comparative analysis of two distinct model classes—Linear Models and K-Nearest Neighbors (KNN)—applied to the Saratoga, NY house prices dataset. The linear model should clearly outperform the "medium" linear model previously considered. Our objective was to develop a predictive model that accurately estimates house prices, thereby assisting the local taxing authority in determining property taxes based on predicted market values. Through extensive analysis, we aimed to identify the model that achieves the lowest out-of-sample mean-squared error (MSE), indicating superior predictive accuracy.
+
+# Question 1: Part 1: Building an Enhanced Linear Model 
+
+```{r, echo=FALSE}
+
+lmall = lm(price ~ ., data=saratoga_train)
+summary(lmall)
+
+```
+
+Started by running an "everything and the kitchen sink" model and proceeding with only the variables that are statistically signficant, or at least marginally statisitcally significant, depending on intution.
+
+```{r, echo=FALSE}
+
+saratoga_train$HotWaterSteamHeating <- ifelse(saratoga_train$heating == "hot water/steam", "Yes", "No")
+saratoga_test$HotWaterSteamHeating <- ifelse(saratoga_test$heating == "hot water/steam", "Yes", "No")
+lm_enhanced = lm(price ~ . - pctCollege - sewer - fireplaces - heating - fuel - livingArea + lotSize:waterfront + livingArea:bathrooms + livingArea:bedrooms + log(livingArea) + HotWaterSteamHeating, data=saratoga_train)
+summary(lm_enhanced)
+```
+
+Created a model with the relevant variables, engineered a new variables, added a few interaction terms and one logarithmic transformation. We included these interaction terms due to our suspicion that the combination of living area size and the number of bedrooms or bathrooms together influence the price of a house in ways that considering each of these factors alone cannot capture. We also included a logarithmic transformation of the living area variable in order to capture how proportional changes in living area affect price, allowing for non-linearity in the relationship between these variables. Also, we noticed in the everything and the kitchen sink model that the only heating type with statistically significant effect on price was "hot water/steam", so we engineered a categorical variable for Hot Water Steam Heating and included it in the model. 
+
+```{r, echo=FALSE}
+out = do(100)*{
+  saratoga_split = initial_split(SaratogaHouses, prop = 0.8)
+  saratoga_train = training(saratoga_split)
+  saratoga_test = testing(saratoga_split)
+  lm2 = lm(price ~ (. - pctCollege - sewer - waterfront - landValue -
+                      newConstruction), data=saratoga_train)
+  saratoga_train$HotWaterSteamHeating <- ifelse(saratoga_train$heating == "hot water/steam", "Yes", "No")
+  saratoga_test$HotWaterSteamHeating <- ifelse(saratoga_test$heating == "hot water/steam", "Yes", "No")
+  
+  lm_enhanced = lm(price ~ (. - pctCollege - sewer - fireplaces - heating - fuel - livingArea + lotSize:waterfront + livingArea:bathrooms + livingArea:bedrooms + log(livingArea) + HotWaterSteamHeating), data=saratoga_train)
+  rmse2 = rmse(lm2, saratoga_test)
+  rmse_enhanced = rmse(lm_enhanced, saratoga_test)
+  c(rmse2, rmse_enhanced)
+}
+
+
+average_rmse <- colMeans(out)
+
+names(average_rmse) <- c("lm2", "lm_enhanced")
+
+cat("Average Out-of-Sample RMSE Across 100 Train/Test Splits\n")
+print(average_rmse)
+```
+
+As evidenced above, the average out-of-sample RMSE for our enhanced model is clearly lower than that of the previously considered medium model. We used the average RMSEs over 100 train/test splits in order to account for random variation in measuring out-of-sample performance. 
+
+# Question 1: Part 2: Building the KNN Model
+
+```{r, echo=FALSE}
+
+# Define the features to include
+features <- c("lotSize", "age", "landValue", "bedrooms", "bathrooms", 
+              "rooms", "waterfrontNo", "newConstructionNo", 
+              "centralAirNo", "HotWaterSteamHeatingYes")
+
+# Prepare the dataset
+# Generate Hot Water Steam Heating Variable
+SaratogaHouses$HotWaterSteamHeatingYes <- ifelse(SaratogaHouses$heating == "hot water/steam", 1, 0)
+SaratogaHouses$waterfrontNo <- ifelse(SaratogaHouses$waterfront == "No", 1, 0)
+SaratogaHouses$newConstructionNo <- ifelse(SaratogaHouses$newConstruction == "No", 1, 0)
+SaratogaHouses$centralAirNo <- ifelse(SaratogaHouses$centralAir == "No", 1, 0)
+
+set.seed(123)
+trainIndex <- createDataPartition(SaratogaHouses$price, p = .8, list = FALSE)
+trainSet <- SaratogaHouses[trainIndex, c(features, "price")]
+testSet <- SaratogaHouses[-trainIndex, c(features, "price")]
+
+# Train
+set.seed(123)
+control <- trainControl(method = "repeatedcv", number = 10, repeats = 3, search = "random")
+knnFit <- train(price ~ ., data = trainSet, method = "knn", preProcess = c("center", "scale"), trControl = control, tuneLength = 10)
+
+# Evaluate
+predictions <- predict(knnFit, newdata = testSet)
+KNNperformance <- postResample(pred = predictions, obs = testSet$price)
+
+# Output
+print(knnFit)
+print(KNNperformance)
+
+```
+
+```{r, echo=FALSE}
+
+KNN_RMSE <- KNNperformance[1]
+
+# Directly use `average_rmse` for lm2 and lm_enhanced
+# Add the KNN RMSE to the existing `average_rmse` vector for consistency
+average_rmse["KNN (k=14)"] <- KNN_RMSE
+
+# Print the results with a title
+cat("Average Out-of-Sample RMSE Across 100 Train/Test Splits\n")
+print(average_rmse)
+```
+
+# Q1: Conclusion
+Based on our analysis, the KNN model slightly outperforms the enhanced linear model in terms of predictive accuracy, as evidenced by a lower average out-of-sample RMSE. This suggests that for the purpose of estimating house prices in Saratoga, NY, the KNN model might be the preferred choice. However, it's important to note that the difference in performance between the two models is relatively modest.
+
+The choice between these models should also consider factors such as interpretability, computational efficiency, and ease of implementation. While the KNN model offers marginally better accuracy, the enhanced linear model provides clearer insights into how specific features influence house prices, which could be valuable for policy formulation and decision-making by the local taxing authority.
+
+```{r}
+
