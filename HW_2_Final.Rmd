@@ -26,6 +26,7 @@ library(foreach)
 library(kknn)
 library(reshape2)
 library(dplyr)
+library(glmnet)
 
 credit_data = read.csv("C://Users/jacob/Downloads/german_credit.csv", header = TRUE)
 hotels_dev = read.csv("C://Users/jacob/Downloads/hotels_dev.csv", header = TRUE) 
