@@ -62,7 +62,7 @@ summary(lm_enhanced)
 
 ```
 
-We proceeded by creating a model with the relevant variables remaining after the backwards selection process, then adding a relevant interaction term (living area:bedrooms) and one logarithmic transformation. We included an interaction of living area size and number of bedrooms because suspected that the combination of living area size and the number of bedrooms together influence the price of a house in ways that considering each of these factors alone cannot capture. We also included a logarithmic transformation of the living area variable in order to capture how proportional changes in living area affect price, allowing for non-linearity in the relationship between these variables. 
+We proceeded by creating a model with the relevant variables remaining after the backwards selection process, then adding a relevant interaction term (living area:bedrooms) and one logarithmic transformation. We included an interaction of living area size and number of bedrooms because we suspected that the combination of living area size and the number of bedrooms together influence the price of a house in ways that considering each of these factors alone cannot capture. We also included a logarithmic transformation of the living area variable in order to capture how proportional changes in living area affect price, allowing for non-linearity in the relationship between these variables. 
 
 ```{r, echo=FALSE}
 out = do(100)*{
@@ -142,7 +142,7 @@ print(average_rmse)
 
 # Q1: Conclusion
 
-Based on our analysis, the KNN model seems to do better at achieving a lower out-of-sample mean squared error, indicating a higher level of predictive accuracy relative to the linear moder. This suggests that for the purpose of estimating house prices in Saratoga, NY, the KNN model might be the preferred choice. However, it's important to note that the difference in performance between the two models is relatively modest. The choice between these models should also consider factors such as interpretability and ease of implementation. While the KNN model offers marginally better accuracy, the enhanced linear model provides clearer insights into how specific features influence house prices, which could be valuable for policy formulation and decision-making by the local taxing authority. 
-
+Based on our analysis, the KNN model seems to do better at achieving a lower out-of-sample mean squared error, indicating a higher level of predictive accuracy relative to the linear model. This suggests that for the purpose of estimating house prices in Saratoga, NY, the KNN model might be the preferred choice. However, it's important to note that the difference in performance between the two models is relatively modest. The choice between these models should also consider factors such as interpretability and ease of implementation. While the KNN model offers marginally better accuracy, the enhanced linear model provides clearer insights into how specific features influence house prices, which could be valuable for policy formulation and decision-making by the local taxing authority. Considering the taxing authority's need to predict property values to determine tax policy, the slightly lower RMSE achieved by the KNN model suggests that the KNN model is performing marginally better at predicting property values in this context. 
+ 
 ```{r}
 
