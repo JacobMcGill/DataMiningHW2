@@ -117,13 +117,7 @@ hotels_dev = hotels_dev %>%
 
 
 ```{r, include = FALSE}
-engineered_model = train(children ~ market_segment+ poly(adults,2) + customer_type                                               +is_repeated_guest                                                                            + is_repeated_guest*previous_cancellations                                                   + month + summer +adults*summer + poly(lead_time,2) 
-                                   +previous_cancellations + previous_bookings_not_canceled 
-                                   + previous_cancellations*previous_bookings_not_canceled 
-                                  + poly(stays_in_weekend_nights, 2) + meal + market_segment 
-                                   + distribution_channel + reserved_room_type                                                   + assigned_room_type + poly(booking_changes, 2)                                               + deposit_type 
-                                   + days_in_waiting_list + poly(average_daily_rate,2) 
-                                   + required_car_parking_spaces                                                                 +  poly(total_of_special_requests, 2)                                                         +  poly(stays_in_week_nights,2), 
+engineered_model = train(children ~ market_segment+ poly(adults,2) + customer_type                                              +is_repeated_guest + is_repeated_guest*previous_cancellations + month + summer +adults*summer + poly(lead_time,2) +previous_cancellations + previous_bookings_not_canceled + previous_cancellations*previous_bookings_not_canceled + poly(stays_in_weekend_nights, 2) + meal + market_segment + distribution_channel + reserved_room_type + assigned_room_type + poly(booking_changes, 2) + deposit_type + days_in_waiting_list + poly(average_daily_rate,2) + required_car_parking_spaces +  poly(total_of_special_requests, 2)+  poly(stays_in_week_nights,2), 
                   data=hotels_dev, 
                   method = "lm", 
                   trControl = train.control)
