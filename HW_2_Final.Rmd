@@ -278,7 +278,7 @@ predict_val = predict(engineered_model, hotels_val)
 roc_graph = roc(hotels_val$children, predict_val)
 ```
 
-```{r, include = TRUE}
+```{r, include = TRUE, echo = FALSE}
 ggplot(data = coords(roc_graph), aes(x = 1 - specificity, y = sensitivity)) +
   geom_line(color = "blue") +
   labs(title = "ROC Curve") +
@@ -309,7 +309,7 @@ comparison_data = data.frame(Fold = seq_along(val_folds), Actual_Bookings = actu
 
 The below figure summarizes this performance, with the red bars being the actual amount of bookings with children and the red the predicted amount of bookings. As can be seen, the model does moderately well at predicting the total number of bookings with children. While the model did not perfectly predict a fold, it was never substantially of (such as having a prediction off by 10 or more). Considering that each fold has about 250 bookings, that is not a substantial deviance.
 
-```{R, include = TRUE}
+```{R, include = TRUE, echo = FALSE}
 graph_comparison = melt(comparison_data, id.vars = "Fold", variable.name = "Type", value.name = "Sum")
 
 ggplot(graph_comparison, aes(x = factor(Fold), y = Sum, fill = Type)) +
