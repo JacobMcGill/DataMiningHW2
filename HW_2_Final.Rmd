@@ -29,9 +29,10 @@ library(dplyr)
 
 credit_data = read.csv("C://Users/jacob/Downloads/german_credit.csv", header = TRUE)
 hotels_dev = read.csv("C://Users/jacob/Downloads/hotels_dev.csv", header = TRUE) 
+mushrooms = read.csv("C://Users/jacob/Downloads/mushrooms.csv", header = TRUE)
 ```
 
-# Question 2
+# Question 2: German Credit Data
 
 
 ```{r, echo=FALSE, warning=FALSE,include=FALSE}
@@ -70,7 +71,7 @@ The  data and analysis from a German bank highlight a puzzling relationship betw
 
 This contradiction is likely due to the bank's sampling method, which oversamples defaults. This method creates a bias, making the model less applicable to the general population of borrowers. For the model to be useful in screening new borrowers, the bank needs to use a sample that accurately reflects the true default rate in its overall portfolio. Correcting this sampling bias is essential for the bank to develop a reliable model for classifying borrowers by default risk.
 
-# Question 3: Hotel Bookins
+# Question 3: Hotel Bookings
 
 ## Model Engineering
 
@@ -189,4 +190,115 @@ ggplot(graph_comparison, aes(x = factor(Fold), y = Sum, fill = Type)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
   labs(x = "Fold", y = "Bookings", title = "Comparison of Predicted vs. Actual Bookings") 
 ```
+
+# Question 4: Poisonous Mushrooms
+
+```{r, echo=FALSE,warning=FALSE}
+mushrooms[] <- lapply(mushrooms, function(x) if(is.character(x)) factor(x) else x)
+
+
+mushrooms <- mushrooms[, sapply(mushrooms, function(x) nlevels(x) > 1)]
+
+
+dummies <- dummyVars(" ~ .", data = mushrooms)
+mushrooms_transformed <- predict(dummies, newdata = mushrooms)
+
+
+y <- mushrooms_transformed[, 1]
+X <- mushrooms_transformed[, -1]
+
+
+set.seed(123)  # For reproducibility
+cv_model <- cv.glmnet(as.matrix(X), as.factor(y), alpha = 1, family = "binomial", nfolds = 10)
+
+
+optimal_lambda <- cv_model$lambda.min
+
+
+print(paste("Optimal lambda:", optimal_lambda))
+```
+
+```{r, echo=FALSE,warning=FALSE}
+
+mushrooms <- mushrooms[sapply(mushrooms, function(x) length(unique(x))) > 1]
+mushrooms[] <- lapply(mushrooms, factor)
+
+set.seed(123) 
+trainIndex <- createDataPartition(mushrooms$class, p = .8, 
+                                  list = FALSE, times = 1)
+mushrooms_train <- mushrooms[trainIndex, ]
+mushrooms_test <- mushrooms[-trainIndex, ]
+
+mushrooms_test[] <- lapply(names(mushrooms_test), function(name) {
+  if (name %in% names(mushrooms_train)) {
+    factor(mushrooms_test[[name]], levels = levels(mushrooms_train[[name]]))
+  } else {
+    mushrooms_test[[name]]
+  }
+})
+
+train_matrix <- model.matrix(~ . - 1, data = mushrooms_train)
+test_matrix <- model.matrix(~ . - 1, data = mushrooms_test)
+
+
+if (ncol(train_matrix) != ncol(test_matrix)) {
+  stop("The number of variables in the training and test sets do not match.")
+}
+
+train_class <- as.numeric(mushrooms_train$class) - 1
+test_class <- as.numeric(mushrooms_test$class) - 1
+
+
+set.seed(123) 
+cv_model <- cv.glmnet(train_matrix, train_class, family = "binomial", alpha = 1)
+```
+
+```{r, echo=FALSE,warning=FALSE}
+predictions <- predict(cv_model, newx = test_matrix, s = "lambda.min", type = "response")
+roc_result <- roc(test_class, predictions)
+plot(roc_result, main = "ROC Curve")
+auc(roc_result)
+```
+
+```{r, echo=FALSE,warning=FALSE}
+threshold <- 0.5 
+predicted_class <- ifelse(predictions > threshold, 1, 0)
+confusionMatrix <- table(Predicted = predicted_class, Actual = test_class)
+print(confusionMatrix)
+```
+```{r,echo=FALSE,warning=FALSE}
+set.seed(123)  
+trainIndex <- createDataPartition(mushrooms$class, p = .7, list = FALSE, times = 1)
+trainData <- mushrooms_transformed[trainIndex, ]
+testData <- mushrooms_transformed[-trainIndex, ]
+
+
+model <- glmnet(as.matrix(trainData[, -1]), as.factor(trainData[, 1]), alpha = 1, family = "binomial", lambda = optimal_lambda)
+
+
+predictions <- predict(model, newx = as.matrix(testData[, -1]), type = "response")
+
+
+predicted_class <- ifelse(predictions > 0.5, 1, 0)  # Adjust the threshold if necessary
+
+
+conf_matrix <- table(predicted_class, testData[, 1])
+
+
+TPR <- conf_matrix[2, 2] / (conf_matrix[2, 2] + conf_matrix[2, 1])  # True Positives / (True Positives + False Negatives)
+FPR <- conf_matrix[1, 2] / (conf_matrix[1, 2] + conf_matrix[1, 1])  # False Positives / (False Positives + True Negatives)
+```
+
+```{r,echo=FALSE,warning=FALSE}
+
+paste("True Positive Rate:", TPR)
+paste("False Positive Rate:", FPR)
+```
+
+The document contains results from a Lasso regression model with 10-fold cross-validation, indicating an optimal lambda value of approximately 0.000676. The area under the ROC curve (AUC) is 1, suggesting perfect model performance. The confusion matrix shows no misclassifications, with 841 true negatives and 783 true positives, leading to a True Positive Rate (TPR) of 1 and a False Positive Rate (FPR) of 0. These results suggest that the model perfectly distinguishes between the classes without any errors, so a threshold of 1 would be recommended for declaring a mushroom poisonous.
+
+
+
+
+
 
