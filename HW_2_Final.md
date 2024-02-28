@@ -12,141 +12,157 @@ with practicality for use by the local taxing authority.
 
 ## Question 1: Part 1: Building an Enhanced Linear Model
 
-    ## Start:  AIC=30362.29
+    ## Start:  AIC=30282.24
     ## price ~ lotSize + age + landValue + livingArea + pctCollege + 
     ##     bedrooms + fireplaces + bathrooms + rooms + heating + fuel + 
     ##     sewer + waterfront + newConstruction + centralAir
     ## 
     ##                   Df  Sum of Sq        RSS   AIC
-    ## - sewer            2 8.8181e+08 4.6776e+12 30359
-    ## - fireplaces       1 5.8001e+08 4.6772e+12 30361
-    ## - pctCollege       1 6.7086e+08 4.6773e+12 30361
-    ## - fuel             2 7.4980e+09 4.6842e+12 30361
-    ## <none>                          4.6767e+12 30362
-    ## - heating          2 1.4197e+10 4.6909e+12 30363
-    ## - age              1 1.4439e+10 4.6911e+12 30365
-    ## - rooms            1 1.9336e+10 4.6960e+12 30366
-    ## - centralAir       1 2.4660e+10 4.7013e+12 30368
-    ## - bedrooms         1 3.5005e+10 4.7117e+12 30371
-    ## - lotSize          1 3.7246e+10 4.7139e+12 30371
-    ## - waterfront       1 9.1376e+10 4.7680e+12 30387
-    ## - newConstruction  1 1.0747e+11 4.7841e+12 30392
-    ## - bathrooms        1 1.2300e+11 4.7997e+12 30396
-    ## - livingArea       1 6.5833e+11 5.3350e+12 30542
-    ## - landValue        1 1.0619e+12 5.7386e+12 30643
+    ## - sewer            2 5.9727e+09 4.4195e+12 30280
+    ## - fireplaces       1 1.9887e+07 4.4135e+12 30280
+    ## - age              1 4.1804e+07 4.4135e+12 30280
+    ## - pctCollege       1 1.0457e+08 4.4136e+12 30280
+    ## - fuel             2 1.0136e+10 4.4236e+12 30281
+    ## <none>                          4.4135e+12 30282
+    ## - heating          2 2.3261e+10 4.4367e+12 30286
+    ## - centralAir       1 1.9275e+10 4.4328e+12 30286
+    ## - rooms            1 2.4272e+10 4.4378e+12 30288
+    ## - bedrooms         1 3.5352e+10 4.4488e+12 30291
+    ## - lotSize          1 4.9730e+10 4.4632e+12 30296
+    ## - waterfront       1 6.8851e+10 4.4823e+12 30302
+    ## - newConstruction  1 7.4325e+10 4.4878e+12 30303
+    ## - bathrooms        1 1.2747e+11 4.5409e+12 30320
+    ## - livingArea       1 6.5086e+11 5.0643e+12 30470
+    ## - landValue        1 1.0768e+12 5.4903e+12 30582
     ## 
-    ## Step:  AIC=30358.55
+    ## Step:  AIC=30280.11
     ## price ~ lotSize + age + landValue + livingArea + pctCollege + 
     ##     bedrooms + fireplaces + bathrooms + rooms + heating + fuel + 
     ##     waterfront + newConstruction + centralAir
     ## 
     ##                   Df  Sum of Sq        RSS   AIC
-    ## - fuel             2 6.6479e+09 4.6842e+12 30357
-    ## - fireplaces       1 5.1861e+08 4.6781e+12 30357
-    ## - pctCollege       1 9.6098e+08 4.6785e+12 30357
-    ## <none>                          4.6776e+12 30359
-    ## - heating          2 1.4549e+10 4.6921e+12 30359
-    ## - age              1 1.4719e+10 4.6923e+12 30361
-    ## - rooms            1 1.9318e+10 4.6969e+12 30362
-    ## - centralAir       1 2.4177e+10 4.7017e+12 30364
-    ## - bedrooms         1 3.4388e+10 4.7119e+12 30367
-    ## - lotSize          1 4.4799e+10 4.7224e+12 30370
-    ## - waterfront       1 9.1897e+10 4.7694e+12 30383
-    ## - newConstruction  1 1.0803e+11 4.7856e+12 30388
-    ## - bathrooms        1 1.2214e+11 4.7997e+12 30392
-    ## - livingArea       1 6.5831e+11 5.3359e+12 30539
-    ## - landValue        1 1.0687e+12 5.7462e+12 30641
+    ## - fireplaces       1 1.3757e+07 4.4195e+12 30278
+    ## - age              1 8.1696e+07 4.4195e+12 30278
+    ## - fuel             2 6.8366e+09 4.4263e+12 30278
+    ## - pctCollege       1 5.2399e+08 4.4200e+12 30278
+    ## <none>                          4.4195e+12 30280
+    ## - centralAir       1 1.7887e+10 4.4373e+12 30284
+    ## - heating          2 2.4726e+10 4.4442e+12 30284
+    ## - rooms            1 2.4559e+10 4.4440e+12 30286
+    ## - bedrooms         1 3.3711e+10 4.4532e+12 30289
+    ## - lotSize          1 6.7252e+10 4.4867e+12 30299
+    ## - waterfront       1 7.0701e+10 4.4902e+12 30300
+    ## - newConstruction  1 7.5985e+10 4.4954e+12 30302
+    ## - bathrooms        1 1.2423e+11 4.5437e+12 30316
+    ## - livingArea       1 6.5157e+11 5.0710e+12 30468
+    ## - landValue        1 1.0716e+12 5.4911e+12 30578
     ## 
-    ## Step:  AIC=30356.51
+    ## Step:  AIC=30278.11
     ## price ~ lotSize + age + landValue + livingArea + pctCollege + 
-    ##     bedrooms + fireplaces + bathrooms + rooms + heating + waterfront + 
+    ##     bedrooms + bathrooms + rooms + heating + fuel + waterfront + 
     ##     newConstruction + centralAir
     ## 
     ##                   Df  Sum of Sq        RSS   AIC
-    ## - fireplaces       1 4.3313e+08 4.6846e+12 30355
-    ## - pctCollege       1 5.2278e+08 4.6847e+12 30355
-    ## <none>                          4.6842e+12 30357
-    ## - age              1 1.8496e+10 4.7027e+12 30360
-    ## - rooms            1 1.9355e+10 4.7036e+12 30360
-    ## - centralAir       1 2.5133e+10 4.7093e+12 30362
-    ## - heating          2 3.6377e+10 4.7206e+12 30363
-    ## - bedrooms         1 3.2667e+10 4.7169e+12 30364
-    ## - lotSize          1 4.0184e+10 4.7244e+12 30366
-    ## - waterfront       1 8.8297e+10 4.7725e+12 30380
-    ## - newConstruction  1 1.0606e+11 4.7903e+12 30386
-    ## - bathrooms        1 1.2588e+11 4.8101e+12 30391
-    ## - livingArea       1 6.5553e+11 5.3397e+12 30536
-    ## - landValue        1 1.0959e+12 5.7801e+12 30645
+    ## - age              1 7.8285e+07 4.4195e+12 30276
+    ## - fuel             2 6.8330e+09 4.4263e+12 30276
+    ## - pctCollege       1 5.5849e+08 4.4200e+12 30276
+    ## <none>                          4.4195e+12 30278
+    ## - centralAir       1 1.8010e+10 4.4375e+12 30282
+    ## - heating          2 2.4867e+10 4.4443e+12 30282
+    ## - rooms            1 2.4659e+10 4.4441e+12 30284
+    ## - bedrooms         1 3.3700e+10 4.4532e+12 30287
+    ## - lotSize          1 6.7364e+10 4.4868e+12 30297
+    ## - waterfront       1 7.0824e+10 4.4903e+12 30298
+    ## - newConstruction  1 7.6229e+10 4.4957e+12 30300
+    ## - bathrooms        1 1.2489e+11 4.5444e+12 30315
+    ## - livingArea       1 6.8158e+11 5.1010e+12 30474
+    ## - landValue        1 1.0719e+12 5.4914e+12 30576
     ## 
-    ## Step:  AIC=30354.64
-    ## price ~ lotSize + age + landValue + livingArea + pctCollege + 
-    ##     bedrooms + bathrooms + rooms + heating + waterfront + newConstruction + 
+    ## Step:  AIC=30276.14
+    ## price ~ lotSize + landValue + livingArea + pctCollege + bedrooms + 
+    ##     bathrooms + rooms + heating + fuel + waterfront + newConstruction + 
     ##     centralAir
     ## 
     ##                   Df  Sum of Sq        RSS   AIC
-    ## - pctCollege       1 6.6551e+08 4.6853e+12 30353
-    ## <none>                          4.6846e+12 30355
-    ## - age              1 1.8214e+10 4.7028e+12 30358
-    ## - rooms            1 1.9545e+10 4.7042e+12 30358
-    ## - centralAir       1 2.4727e+10 4.7094e+12 30360
-    ## - heating          2 3.6221e+10 4.7209e+12 30361
-    ## - bedrooms         1 3.2494e+10 4.7171e+12 30362
-    ## - lotSize          1 3.9988e+10 4.7246e+12 30364
-    ## - waterfront       1 8.8399e+10 4.7730e+12 30379
-    ## - newConstruction  1 1.0569e+11 4.7903e+12 30384
-    ## - bathrooms        1 1.2598e+11 4.8106e+12 30389
-    ## - livingArea       1 6.7475e+11 5.3594e+12 30539
-    ## - landValue        1 1.0960e+12 5.7806e+12 30643
+    ## - pctCollege       1 5.6125e+08 4.4201e+12 30274
+    ## - fuel             2 7.3058e+09 4.4269e+12 30274
+    ## <none>                          4.4195e+12 30276
+    ## - centralAir       1 1.8504e+10 4.4381e+12 30280
+    ## - heating          2 2.6598e+10 4.4461e+12 30280
+    ## - rooms            1 2.4734e+10 4.4443e+12 30282
+    ## - bedrooms         1 3.4806e+10 4.4544e+12 30285
+    ## - lotSize          1 6.8674e+10 4.4882e+12 30295
+    ## - waterfront       1 7.0753e+10 4.4903e+12 30296
+    ## - newConstruction  1 7.7179e+10 4.4967e+12 30298
+    ## - bathrooms        1 1.3872e+11 4.5583e+12 30317
+    ## - livingArea       1 6.8153e+11 5.1011e+12 30472
+    ## - landValue        1 1.0874e+12 5.5069e+12 30578
     ## 
-    ## Step:  AIC=30352.83
-    ## price ~ lotSize + age + landValue + livingArea + bedrooms + bathrooms + 
+    ## Step:  AIC=30274.31
+    ## price ~ lotSize + landValue + livingArea + bedrooms + bathrooms + 
+    ##     rooms + heating + fuel + waterfront + newConstruction + centralAir
+    ## 
+    ##                   Df  Sum of Sq        RSS   AIC
+    ## - fuel             2 6.9370e+09 4.4270e+12 30273
+    ## <none>                          4.4201e+12 30274
+    ## - centralAir       1 1.7944e+10 4.4381e+12 30278
+    ## - heating          2 2.7058e+10 4.4472e+12 30279
+    ## - rooms            1 2.4739e+10 4.4448e+12 30280
+    ## - bedrooms         1 3.5537e+10 4.4556e+12 30283
+    ## - lotSize          1 6.9102e+10 4.4892e+12 30294
+    ## - waterfront       1 7.2480e+10 4.4926e+12 30295
+    ## - newConstruction  1 7.7244e+10 4.4974e+12 30296
+    ## - bathrooms        1 1.3895e+11 4.5591e+12 30315
+    ## - livingArea       1 6.8105e+11 5.1012e+12 30470
+    ## - landValue        1 1.1065e+12 5.5266e+12 30581
+    ## 
+    ## Step:  AIC=30272.48
+    ## price ~ lotSize + landValue + livingArea + bedrooms + bathrooms + 
     ##     rooms + heating + waterfront + newConstruction + centralAir
     ## 
     ##                   Df  Sum of Sq        RSS   AIC
-    ## <none>                          4.6853e+12 30353
-    ## - age              1 1.8029e+10 4.7033e+12 30356
-    ## - rooms            1 1.9669e+10 4.7050e+12 30357
-    ## - centralAir       1 2.4062e+10 4.7094e+12 30358
-    ## - heating          2 3.6291e+10 4.7216e+12 30360
-    ## - bedrooms         1 3.3384e+10 4.7187e+12 30361
-    ## - lotSize          1 4.0858e+10 4.7262e+12 30363
-    ## - waterfront       1 9.1778e+10 4.7771e+12 30378
-    ## - newConstruction  1 1.0636e+11 4.7917e+12 30382
-    ## - bathrooms        1 1.2585e+11 4.8111e+12 30388
-    ## - livingArea       1 6.7409e+11 5.3594e+12 30537
-    ## - landValue        1 1.1260e+12 5.8113e+12 30649
+    ## <none>                          4.4270e+12 30273
+    ## - centralAir       1 1.9515e+10 4.4466e+12 30277
+    ## - heating          2 3.0525e+10 4.4576e+12 30278
+    ## - rooms            1 2.5001e+10 4.4520e+12 30278
+    ## - bedrooms         1 3.4742e+10 4.4618e+12 30281
+    ## - lotSize          1 6.3071e+10 4.4901e+12 30290
+    ## - waterfront       1 7.0369e+10 4.4974e+12 30292
+    ## - newConstruction  1 7.6088e+10 4.5031e+12 30294
+    ## - bathrooms        1 1.5209e+11 4.5791e+12 30317
+    ## - livingArea       1 6.7974e+11 5.1068e+12 30468
+    ## - landValue        1 1.1317e+12 5.5587e+12 30585
 
     ## 
     ## Call:
-    ## lm(formula = price ~ lotSize + age + landValue + livingArea + 
-    ##     bedrooms + bathrooms + rooms + heating + waterfront + newConstruction + 
+    ## lm(formula = price ~ lotSize + landValue + livingArea + bedrooms + 
+    ##     bathrooms + rooms + heating + waterfront + newConstruction + 
     ##     centralAir, data = saratoga_train)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -206349  -35676   -4508   28130  453133 
+    ## -224164  -34086   -4181   27825  453762 
     ## 
     ## Coefficients:
     ##                          Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)             8.385e+04  2.172e+04   3.860 0.000119 ***
-    ## lotSize                 8.558e+03  2.477e+03   3.455 0.000567 ***
-    ## age                    -1.497e+02  6.523e+01  -2.295 0.021875 *  
-    ## landValue               9.494e-01  5.234e-02  18.139  < 2e-16 ***
-    ## livingArea              7.085e+01  5.048e+00  14.034  < 2e-16 ***
-    ## bedrooms               -9.137e+03  2.925e+03  -3.123 0.001826 ** 
-    ## bathrooms               2.261e+04  3.729e+03   6.064 1.72e-09 ***
-    ## rooms                   2.579e+03  1.076e+03   2.397 0.016648 *  
-    ## heatinghot water/steam -9.891e+03  4.713e+03  -2.098 0.036048 *  
-    ## heatingelectric        -1.311e+04  4.594e+03  -2.853 0.004391 ** 
-    ## waterfrontNo           -9.355e+04  1.807e+04  -5.178 2.57e-07 ***
-    ## newConstructionNo       4.420e+04  7.928e+03   5.575 2.98e-08 ***
-    ## centralAirNo           -1.018e+04  3.840e+03  -2.652 0.008105 ** 
+    ## (Intercept)             7.369e+04  2.299e+04   3.205  0.00138 ** 
+    ## lotSize                 1.236e+04  2.797e+03   4.418 1.07e-05 ***
+    ## landValue               9.421e-01  5.034e-02  18.714  < 2e-16 ***
+    ## livingArea              7.207e+01  4.969e+00  14.504  < 2e-16 ***
+    ## bedrooms               -9.184e+03  2.801e+03  -3.279  0.00107 ** 
+    ## bathrooms               2.384e+04  3.474e+03   6.860 1.04e-11 ***
+    ## rooms                   2.912e+03  1.047e+03   2.782  0.00548 ** 
+    ## heatinghot water/steam -1.325e+04  4.442e+03  -2.982  0.00291 ** 
+    ## heatingelectric        -6.245e+03  4.381e+03  -1.425  0.15431    
+    ## waterfrontNo           -9.092e+04  1.948e+04  -4.667 3.36e-06 ***
+    ## newConstructionNo       3.706e+04  7.637e+03   4.852 1.36e-06 ***
+    ## centralAirNo           -9.046e+03  3.681e+03  -2.457  0.01411 *  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 58500 on 1369 degrees of freedom
-    ## Multiple R-squared:  0.6446, Adjusted R-squared:  0.6414 
-    ## F-statistic: 206.9 on 12 and 1369 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 56850 on 1370 degrees of freedom
+    ## Multiple R-squared:  0.6644, Adjusted R-squared:  0.6617 
+    ## F-statistic: 246.5 on 11 and 1370 DF,  p-value: < 2.2e-16
 
 Started by running an “everything and the kitchen sink” model and then
 used a backwards selection approach to iteratively delete statistically
@@ -160,31 +176,31 @@ insignificant variables in order to improve model performance.
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -207797  -34145   -4680   27595  443608 
+    ## -226209  -33183   -3998   26906  444748 
     ## 
     ## Coefficients:
     ##                          Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)             1.014e+06  1.874e+05   5.410 7.44e-08 ***
-    ## lotSize                 7.594e+03  2.463e+03   3.083  0.00209 ** 
-    ## age                    -1.488e+02  6.507e+01  -2.286  0.02240 *  
-    ## landValue               8.943e-01  5.302e-02  16.867  < 2e-16 ***
-    ## livingArea              2.148e+02  2.980e+01   7.209 9.32e-13 ***
-    ## bedrooms                2.282e+04  8.028e+03   2.843  0.00454 ** 
-    ## bathrooms               2.452e+04  3.716e+03   6.599 5.92e-11 ***
-    ## rooms                   1.864e+03  1.077e+03   1.731  0.08363 .  
-    ## heatinghot water/steam -8.327e+03  4.685e+03  -1.778  0.07569 .  
-    ## heatingelectric        -1.318e+04  4.584e+03  -2.876  0.00409 ** 
-    ## waterfrontNo           -9.305e+04  1.791e+04  -5.195 2.36e-07 ***
-    ## newConstructionNo       4.708e+04  7.888e+03   5.969 3.04e-09 ***
-    ## centralAirNo           -1.177e+04  3.823e+03  -3.079  0.00212 ** 
-    ## log(livingArea)        -1.600e+05  3.167e+04  -5.051 4.98e-07 ***
-    ## livingArea:bedrooms    -1.643e+01  4.077e+00  -4.029 5.91e-05 ***
+    ## (Intercept)             9.023e+05  1.753e+05   5.147 3.03e-07 ***
+    ## lotSize                 1.155e+04  2.793e+03   4.137 3.74e-05 ***
+    ## age                    -2.471e+01  6.279e+01  -0.394 0.693978    
+    ## landValue               8.926e-01  5.144e-02  17.353  < 2e-16 ***
+    ## livingArea              1.937e+02  2.724e+01   7.111 1.85e-12 ***
+    ## bedrooms                1.658e+04  7.559e+03   2.194 0.028408 *  
+    ## bathrooms               2.492e+04  3.656e+03   6.814 1.41e-11 ***
+    ## rooms                   2.116e+03  1.054e+03   2.008 0.044820 *  
+    ## heatinghot water/steam -1.105e+04  4.536e+03  -2.435 0.015001 *  
+    ## heatingelectric        -6.596e+03  4.411e+03  -1.495 0.135039    
+    ## waterfrontNo           -9.104e+04  1.937e+04  -4.700 2.87e-06 ***
+    ## newConstructionNo       3.958e+04  7.697e+03   5.143 3.10e-07 ***
+    ## centralAirNo           -1.051e+04  3.702e+03  -2.840 0.004576 ** 
+    ## log(livingArea)        -1.407e+05  2.928e+04  -4.805 1.72e-06 ***
+    ## livingArea:bedrooms    -1.298e+01  3.832e+00  -3.388 0.000724 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 58000 on 1367 degrees of freedom
-    ## Multiple R-squared:  0.6511, Adjusted R-squared:  0.6475 
-    ## F-statistic: 182.2 on 14 and 1367 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 56430 on 1367 degrees of freedom
+    ## Multiple R-squared:   0.67,  Adjusted R-squared:  0.6666 
+    ## F-statistic: 198.2 on 14 and 1367 DF,  p-value: < 2.2e-16
 
 We proceeded by creating a model with the relevant variables remaining
 after the backwards selection process, then adding a relevant
@@ -205,7 +221,7 @@ between these variables.
     ## Average Out-of-Sample RMSE Across 100 Train/Test Splits
 
     ##         lm2 lm_enhanced 
-    ##    66133.65    58121.78
+    ##    67456.79    58642.30
 
 As evidenced above, the average out-of-sample RMSE for our enhanced
 model is clearly lower than that of the previously considered medium
@@ -246,7 +262,7 @@ account for random variation in measuring out-of-sample performance.
     ## Average Out-of-Sample RMSE By Model
 
     ##         lm2 lm_enhanced  KNN (k=14) 
-    ##    66133.65    58121.78    57093.46
+    ##    67456.79    58642.30    57093.46
 
 ## Q1: Conclusion
 
@@ -333,13 +349,14 @@ Summer, a time when children are more likely to be traveling. I also
 added week\_end arrival, which tracked if the reservation started on
 Friday or Saturday. As people arriving on those days are likely
 traveling for vacation rather than business, it would be reasonable to
-assume children would be more likely to be on the reservation.
+assume children would be more likely to be on the reservation. Finally,
+customer type was interacted with several other indicator variables.
 
 The RMSE for the engineered model is:
 
     engineered_rmse
 
-    ## [1] 0.2323567
+    ## [1] 0.2320949
 
 As can be seen, this model outperforms the other 2 in terms of RMSE.
 
