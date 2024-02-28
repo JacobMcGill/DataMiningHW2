@@ -32,6 +32,137 @@ hotels_dev = read.csv("C://Users/jacob/Downloads/hotels_dev.csv", header = TRUE)
 mushrooms = read.csv("C://Users/jacob/Downloads/mushrooms.csv", header = TRUE)
 ```
 
+```{r, include=FALSE}
+data(SaratogaHouses)
+glimpse(SaratogaHouses)
+
+saratoga_split = initial_split(SaratogaHouses, prop = 0.8)
+saratoga_train = training(saratoga_split)
+saratoga_test = testing(saratoga_split)
+
+lm1 = lm(price ~ lotSize + bedrooms + bathrooms, data=saratoga_train)
+lm2 = lm(price ~ . - pctCollege - sewer - waterfront - landValue - newConstruction, data=saratoga_train)
+lm3 = lm(price ~ (. - pctCollege - sewer - waterfront - landValue - newConstruction)^2, data=saratoga_train)
+
+rmse(lm1, saratoga_test)
+rmse(lm2, saratoga_test)
+rmse(lm3, saratoga_test)
+
+```
+
+# Q1: Executive Summary
+
+Focusing on the data set on house prices in Saratoga, NY, this report presents a comparative analysis of two model classes: Linear Models and K-Nearest-Neighbors. We will begin by building a comprehensive linear model, then a KNN model, then will evaluate the two models' efficacy and predictive accuracy by comparing their out-of-sample mean-squared error. The goal is to identify a model that combines high predictive accuracy with practicality for use by the local taxing authority.
+
+## Question 1: Part 1: Building an Enhanced Linear Model 
+
+```{r, echo=FALSE}
+
+lm_full <- lm(price ~ ., data = saratoga_train)
+
+# Apply backward selection
+lm_backward <- step(lm_full, direction = "backward")
+
+# Summary of the model after backward selection
+summary(lm_backward)
+
+backward_formula <- formula(lm_backward)
+
+
+```
+
+Started by running an "everything and the kitchen sink" model and then used a backwards selection approach to iteratively delete statistically insignificant variables in order to improve model performance.  
+
+```{r, echo=FALSE}
+
+lm_enhanced <- lm(price ~ lotSize + age + landValue + livingArea + bedrooms + bathrooms + rooms + heating + waterfront + newConstruction + centralAir + livingArea:bedrooms + log(livingArea), data=saratoga_train)
+summary(lm_enhanced)
+
+```
+
+We proceeded by creating a model with the relevant variables remaining after the backwards selection process, then adding a relevant interaction term (living area:bedrooms) and one logarithmic transformation. We included an interaction of living area size and number of bedrooms because we suspected that the combination of living area size and the number of bedrooms together influence the price of a house in ways that considering each of these factors alone cannot capture. We also included a logarithmic transformation of the living area variable in order to capture how proportional changes in living area affect price, allowing for non-linearity in the relationship between these variables. 
+
+```{r, echo=FALSE, error = FALSE, warnings = FALSE}
+out = do(100)*{
+  saratoga_split = initial_split(SaratogaHouses, prop = 0.8)
+  saratoga_train = training(saratoga_split)
+  saratoga_test = testing(saratoga_split)
+  lm2 = lm(price ~ (. - pctCollege - sewer - waterfront - landValue -
+                      newConstruction), data=saratoga_train)
+  
+  lm_enhanced <- lm(price ~ lotSize + age + landValue + livingArea + bedrooms + bathrooms + rooms + heating + waterfront + newConstruction + centralAir + livingArea:bedrooms + log(livingArea), data=saratoga_train)
+  rmse2 = rmse(lm2, saratoga_test)
+  rmse_enhanced = rmse(lm_enhanced, saratoga_test)
+  c(rmse2, rmse_enhanced)
+}
+
+
+average_rmse <- colMeans(out)
+
+names(average_rmse) <- c("lm2", "lm_enhanced")
+
+cat("Average Out-of-Sample RMSE Across 100 Train/Test Splits\n")
+print(average_rmse)
+```
+
+As evidenced above, the average out-of-sample RMSE for our enhanced model is clearly lower than that of the previously considered medium model. We used the average RMSEs over 100 train/test splits in order to account for random variation in measuring out-of-sample performance. 
+
+## Question 1: Part 2: Building the KNN Model
+
+```{r, echo=FALSE}
+
+# Define the features to include
+features <- c("lotSize", "age", "landValue", "bedrooms", "bathrooms", 
+              "rooms", "waterfrontNo", "newConstructionNo", 
+              "centralAirNo", "HotWaterSteamHeatingYes")
+
+# Prepare the dataset
+# Generate Hot Water Steam Heating Variable
+SaratogaHouses$HotWaterSteamHeatingYes <- ifelse(SaratogaHouses$heating == "hot water/steam", 1, 0)
+SaratogaHouses$waterfrontNo <- ifelse(SaratogaHouses$waterfront == "No", 1, 0)
+SaratogaHouses$newConstructionNo <- ifelse(SaratogaHouses$newConstruction == "No", 1, 0)
+SaratogaHouses$centralAirNo <- ifelse(SaratogaHouses$centralAir == "No", 1, 0)
+
+set.seed(123)
+trainIndex <- createDataPartition(SaratogaHouses$price, p = .8, list = FALSE)
+trainSet <- SaratogaHouses[trainIndex, c(features, "price")]
+testSet <- SaratogaHouses[-trainIndex, c(features, "price")]
+
+# Train
+set.seed(123)
+control <- trainControl(method = "repeatedcv", number = 10, repeats = 3, search = "random")
+knnFit <- train(price ~ ., data = trainSet, method = "knn", preProcess = c("center", "scale"), trControl = control, tuneLength = 10)
+
+# Evaluate
+predictions <- predict(knnFit, newdata = testSet)
+KNNperformance <- postResample(pred = predictions, obs = testSet$price)
+
+# Output
+print(knnFit)
+print(KNNperformance)
+
+```
+
+### Model Comparison: Linear Model vs KNN 
+
+```{r, echo=FALSE}
+
+KNN_RMSE <- KNNperformance[1]
+
+# Directly use `average_rmse` for lm2 and lm_enhanced
+# Add the KNN RMSE to the existing `average_rmse` vector for consistency
+average_rmse["KNN (k=14)"] <- KNN_RMSE
+
+# Print the results with a title
+cat("Average Out-of-Sample RMSE By Model")
+print(average_rmse)
+```
+
+## Q1: Conclusion
+
+Based on our analysis, the KNN model seems to do better at achieving a lower out-of-sample mean squared error, indicating a higher level of predictive accuracy relative to the linear model. This suggests that for the purpose of estimating house prices in Saratoga, NY, the KNN model might be the preferred choice. However, it's important to note that the difference in performance between the two models is relatively modest. The choice between these models should also consider factors such as interpretability and ease of implementation. While the KNN model offers marginally better accuracy, the enhanced linear model provides clearer insights into how specific features influence house prices, which could be valuable for policy formulation and decision-making by the local taxing authority. Considering the taxing authority's need to predict property values to determine tax policy, the slightly lower RMSE achieved by the KNN model suggests that the KNN model is performing marginally better at predicting property values in this context. 
+ 
+
 # Question 2: German Credit Data
 
 
